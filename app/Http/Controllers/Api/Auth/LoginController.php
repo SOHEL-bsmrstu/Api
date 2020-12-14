@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Api\Auth;
 
 
 use App\Http\Controllers\Controller;
+use Exception;
 use Illuminate\Http\JsonResponse;
 
 class LoginController extends Controller
 {
     /**
-     * Create a new AuthController instance.
+     * Create a new LoginController instance.
      *
      * @return void
      */
@@ -24,12 +25,16 @@ class LoginController extends Controller
      *
      * @return JsonResponse
      */
-    public function login()
+    public function login(): JsonResponse
     {
-        $credentials = request(['email', 'password']);
+        try {
+            $credentials = request(['email', 'password']);
 
-        if (! $token = auth()->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            if (!$token = auth()->attempt($credentials)) {
+                return response()->json(['error' => 'Credentials does not match to our records'], 401);
+            }
+        } catch (Exception $exception) {
+            return response()->json(['error' => $exception->getMessage()], 401);
         }
 
         return $this->respondWithToken($token);
@@ -40,7 +45,7 @@ class LoginController extends Controller
      *
      * @return JsonResponse
      */
-    public function authUser()
+    public function authUser(): JsonResponse
     {
         return response()->json(auth()->user());
     }
@@ -50,11 +55,11 @@ class LoginController extends Controller
      *
      * @return JsonResponse
      */
-    public function logout()
+    public function logout(): JsonResponse
     {
         auth()->logout();
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return response()->json(['message' => 'Successfully logged out', 'success' => true]);
     }
 
     /**
@@ -62,7 +67,7 @@ class LoginController extends Controller
      *
      * @return JsonResponse
      */
-    public function refresh()
+    public function refresh(): JsonResponse
     {
         return $this->respondWithToken(auth()->refresh());
     }
@@ -74,12 +79,13 @@ class LoginController extends Controller
      *
      * @return JsonResponse
      */
-    protected function respondWithToken(string $token)
+    protected function respondWithToken(string $token): JsonResponse
     {
         return response()->json([
+            'success'      => (bool) $token,
             'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'token_type'   => 'bearer',
+            'expires_in'   => auth()->factory()->getTTL() * 60
         ]);
     }
 }

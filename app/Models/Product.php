@@ -27,6 +27,11 @@ class Product extends Model
     ];
 
     /**
+     * @var string[]
+     */
+    protected $appends = ["link"];
+
+    /**
      * The attributes that should be cast to native types.
      *
      * @var array
@@ -34,10 +39,18 @@ class Product extends Model
     protected $casts = ['created_at' => 'datetime:d M, Y h:i A'];
 
     /**
-     * @return BelongsTo
+     * @return BelongsTo|null
      */
-    public function user()
+    public function user(): ?BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return string
+     */
+    public function getLinkAttribute(): string
+    {
+        return route("api.products.image", ['product' => $this->id]);
     }
 }
