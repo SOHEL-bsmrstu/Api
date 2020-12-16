@@ -31,7 +31,7 @@ class LoginController extends Controller
             $credentials = request(['email', 'password']);
 
             if (!$token = auth()->attempt($credentials)) {
-                return response()->json(['error' => 'Credentials does not match to our records'], 401);
+                return response()->json(['error' => 'These credentials do not match our records.'], 422);
             }
         } catch (Exception $exception) {
             return response()->json(['error' => $exception->getMessage()], 401);

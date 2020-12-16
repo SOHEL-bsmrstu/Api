@@ -18,8 +18,9 @@ use Laravel\Lumen\Routing\Router;
 $router->group(['prefix' => 'api/products', 'middleware' => 'auth',], function () use ($router) {
     $router->get("/", "FetchAction@fetch");
     $router->post('create', 'CreateAction@create');
-    $router->put('{product}/update', 'UpdateAction@update');
+    $router->get('{product}/edit', 'UpdateAction@edit');
+    $router->post('{product}/update', 'UpdateAction@update');
     $router->delete('{product}/delete', 'DeleteAction@delete');
-
-    $router->get('/{product}/image', ["as" => 'api.products.image', 'uses' => 'FetchAction@imageLink']);
 });
+
+$router->get('api/products/{product}/image', ["as" => 'api.products.image', 'uses' => 'FetchAction@imageLink']);

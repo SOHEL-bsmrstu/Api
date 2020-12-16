@@ -15,6 +15,15 @@ class UpdateAction extends CreateAction
 {
     /**
      * @param Product $product
+     * @return JsonResponse
+     */
+    public function edit(Product $product): JsonResponse
+    {
+        return response()->json(['success' => !!$product, 'product' => $product->only("id", "title", "description", "price", "image")]);
+    }
+
+    /**
+     * @param Product $product
      * @param Request $request
      * @return JsonResponse
      * @throws ValidationException

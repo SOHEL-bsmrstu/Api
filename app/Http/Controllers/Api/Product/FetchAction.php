@@ -19,8 +19,17 @@ class FetchAction extends Controller
     {
         $products = Product::orderBy("id", "desc")->paginate();
 
-        return response()->json(["success" => (bool) $products, "products" => $products]);
-
+        return response()->json(array(
+            "success" => (bool) $products,
+            "meta"    => [
+                "total"       => $products->total(),
+                "first"       => $products->firstItem(),
+                "last"        => $products->lastItem(),
+                "pageCount"   => $products->lastPage(),
+                "currentPage" => $products->currentPage(),
+            ],
+            "data"    => $products->items(),
+        ));
     }
 
     /**
@@ -30,9 +39,9 @@ class FetchAction extends Controller
      */
     public function imageLink(Product $product): BinaryFileResponse
     {
-        $headers = ['Content-Type' => 'image/png'];
+        $headers  = ['Content-Type' => 'image/png'];
         $filePath = $product->createPath($product->image, null, false);
-
+        
         # If custom image exists & is readable then return the file else show 404 error page
         return (isset($filePath) && is_readable($filePath) ? new BinaryFileResponse($filePath, 200 , $headers) : abort(Response::HTTP_NOT_FOUND));
     }
